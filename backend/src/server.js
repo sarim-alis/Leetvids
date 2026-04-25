@@ -3,6 +3,8 @@ import express from "express";
 import dotenv from "dotenv";
 import { ENV } from "./lib/env.js";
 import { connectDb } from "./lib/lib.js";
+import { serve } from "inngest/express";
+import { inngest } from "./lib/inngest.js";
 import cors from "cors";
 dotenv.config();
 
@@ -17,6 +19,7 @@ app.use(clerkMiddleware());
 
 // Routes.
 app.get("/", (req, res) => { res.status(200).json({ message: "Server health is good. 🔋" });})
+app.use("/api/inngest", serve({client: inngest, functions}));
 
 // Server.
 app.listen(ENV.PORT, () => console.log(`Server is running on port ${ENV.PORT} 🍭🌟🚀`)); connectDb()
