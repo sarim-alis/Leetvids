@@ -12,6 +12,7 @@ const app = express();
 // Middlware.
 app.use(express.json());
 app.use(cors({origin:ENV.CLIENT_URL, credentials: true}));
+app.use(clerkMiddleware());
 
 
 // Routes.
