@@ -16,8 +16,7 @@ const app = express();
 
 // Middlware.
 app.use(express.json());
-app.use(cors({origin:ENV.CLIENT_URL, credentials: true}));
-app.use(cors({origin:"https://leetvids.vercel.app", credentials: true}));
+app.use(cors({origin:"*", credentials: false}));
 app.use(clerkMiddleware());
 
 
