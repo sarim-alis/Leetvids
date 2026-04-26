@@ -6,12 +6,14 @@ import { deleteStreamUser, upsertStreamUser } from "../lib/stream.js";
 const router = express.Router();
 
 // Clerk webhook endpoint - direct database operations (no Inngest)
-router.post("/webhook", express.raw({ type: 'application/json' }), async (req, res) => {
+router.post("/webhook", async (req, res) => {
   console.log("[CLERK] Webhook received");
+  console.log("[CLERK] Request body type:", typeof req.body);
+  console.log("[CLERK] Request body:", req.body);
   
   try {
-    // req.body is a Buffer when using express.raw, convert to string then parse
-    const evt = JSON.parse(req.body.toString());
+    // req.body should already be parsed by express.json() middleware
+    const evt = req.body;
     const { type } = evt;
     
     console.log("[CLERK] Event type:", type);
