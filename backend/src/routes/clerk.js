@@ -8,7 +8,8 @@ router.post("/webhook", express.raw({ type: 'application/json' }), async (req, r
   console.log("[CLERK] Webhook received");
   
   try {
-    const evt = JSON.parse(req.body);
+    // req.body is a Buffer when using express.raw, convert to string then parse
+    const evt = JSON.parse(req.body.toString());
     const { type } = evt;
     
     console.log("[CLERK] Event type:", type);
