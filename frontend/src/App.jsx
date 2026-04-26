@@ -50,7 +50,7 @@ function App() {
             </button>
             {testStatus && <p style={{ marginTop: "10px", fontSize: "14px" }}>{testStatus}</p>}
             <p style={{ fontSize: "12px", color: "#666", marginTop: "10px" }}>
-              🔄 Webhook automatically syncs user data to database
+              🔄 Direct webhook syncs user data to database (no Inngest)
             </p>
           </div>
           <SignOutButton />

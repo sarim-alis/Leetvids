@@ -1,9 +1,11 @@
 import express from "express";
-import { inngest } from "../lib/inngest.js";
+import { connectDb } from "../lib/lib.js";
+import User from "../models/User.js";
+import { deleteStreamUser, upsertStreamUser } from "../lib/stream.js";
 
 const router = express.Router();
 
-// Clerk webhook endpoint - automatically triggers Inngest functions
+// Clerk webhook endpoint - direct database operations (no Inngest)
 router.post("/webhook", express.raw({ type: 'application/json' }), async (req, res) => {
   console.log("[CLERK] Webhook received");
   
@@ -14,16 +16,39 @@ router.post("/webhook", express.raw({ type: 'application/json' }), async (req, r
     
     console.log("[CLERK] Event type:", type);
     
-    // Send event to Inngest - this automatically triggers your functions
-    if (type === 'user.created' || type === 'user.deleted') {
-      console.log("[CLERK] Sending event to Inngest:", type);
+    // Handle user creation - direct database save
+    if (type === 'user.created') {
+      console.log("[CLERK] Processing user creation");
+      await connectDb();
       
-      await inngest.send({
-        name: type,
-        data: evt.data
+      const { id, email_addresses, first_name, last_name, image_url } = evt.data;
+      const newUser = {
+        clerkId: id,
+        email: email_addresses[0]?.email_address,
+        name: `${first_name || ""} ${last_name || ""}`,
+        profileImage: image_url || ""
+      };
+
+      await User.create(newUser);
+      await upsertStreamUser({
+        id: newUser.clerkId.toString(),
+        name: newUser.name,
+        image: newUser.profileImage
       });
       
-      console.log("[CLERK] Event sent to Inngest successfully");
+      console.log("[CLERK] User created successfully in database");
+    }
+
+    // Handle user deletion - direct database delete
+    if (type === 'user.deleted') {
+      console.log("[CLERK] Processing user deletion");
+      await connectDb();
+      
+      const { id } = evt.data;
+      await User.deleteOne({ clerkId: id });
+      await deleteStreamUser(id.toString());
+      
+      console.log("[CLERK] User deleted successfully from database");
     }
     
     res.status(200).json({ received: true });
