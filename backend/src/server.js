@@ -5,6 +5,7 @@ import { ENV } from "./lib/env.js";
 import { connectDb } from "./lib/lib.js";
 import { serve } from "inngest/express";
 import { inngest, functions } from "./lib/inngest.js";
+import { clerkMiddleware } from "@clerk/express";
 import cors from "cors";
 dotenv.config();
 
@@ -14,7 +15,7 @@ const app = express();
 // Middlware.
 app.use(express.json());
 app.use(cors({origin:ENV.CLIENT_URL, credentials: true}));
-// app.use(clerkMiddleware());
+app.use(clerkMiddleware());
 
 
 // Routes.
