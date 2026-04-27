@@ -4,14 +4,11 @@ import { ENV } from "./env.js";
 
 const apiKey = ENV.STREAM_API_KEY;
 const apiSecret = ENV.STREAM_API_SECRET;
-
-if (!apiKey || !apiSecret) {
-  console.error("STREAM_API_KEY or STREAM_API_SECRET is missing");
-}
-
+if (!apiKey || !apiSecret) {console.error("STREAM_API_KEY or STREAM_API_SECRET is missing");}
 export const chatClient = StreamChat.getInstance(apiKey, apiSecret);
 export const streamClient = new StreamClient(apiKey, apiSecret);
 
+// Add stream user.
 export const upsertStreamUser = async (userData) => {
   try {
     await chatClient.upsertUser(userData);
@@ -21,6 +18,7 @@ export const upsertStreamUser = async (userData) => {
   }
 };
 
+// Delete stream user.
 export const deleteStreamUser = async (userId) => {
   try {
     await chatClient.deleteUser(userId);

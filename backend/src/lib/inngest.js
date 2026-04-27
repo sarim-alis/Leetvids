@@ -4,6 +4,7 @@ import User from "../models/User.js";
 import { deleteStreamUser, upsertStreamUser } from "./stream.js";
 export const inngest = new Inngest({ id: "leet-vid" });
 
+// Sync user.
 const syncUser = inngest.createFunction(
   { id: "sync-user", triggers: [{ event: "clerk/user.created" }] },
   async ({ event }) => {
@@ -16,6 +17,7 @@ const syncUser = inngest.createFunction(
   }
 );
 
+// Delete user.
 const deleteUserFromDB = inngest.createFunction(
   { id: "delete-user-from-db", triggers: [{ event: "clerk/user.deleted" }] },
   async ({ event }) => {
