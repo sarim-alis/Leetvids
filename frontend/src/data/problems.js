@@ -148,7 +148,7 @@ class Solution {
   "valid-palindrome": {
     id: "valid-palindrome",
     title: "Valid Palindrome",
-    difficulty: "Easy",
+    difficulty: "Medium",
     category: "String • Two Pointers",
     description: {
       text: "A phrase is a palindrome if, after converting all uppercase letters into lowercase letters and removing all non-alphanumeric characters, it reads the same forward and backward. Alphanumeric characters include letters and numbers.",
@@ -281,7 +281,7 @@ print(maxSubArray([5,4,-1,7,8]))  # Expected: 23`,
   "container-with-most-water": {
     id: "container-with-most-water",
     title: "Container With Most Water",
-    difficulty: "Medium",
+    difficulty: "Hard",
     category: "Array • Two Pointers",
     description: {
       text: "You are given an integer array height of length n. There are n vertical lines drawn such that the two endpoints of the ith line are (i, 0) and (i, height[i]).",
