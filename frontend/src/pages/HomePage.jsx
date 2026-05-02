@@ -1,6 +1,6 @@
 import { Link } from "react-router";
 import { ArrowRightIcon, CheckIcon, Code2Icon, MoonIcon, SparklesIcon, SunIcon, UsersIcon, VideoIcon, ZapIcon } from "lucide-react";
-import { SignInButton, useUser } from "@clerk/clerk-react";
+import { SignInButton, UserButton, useUser } from "@clerk/clerk-react";
 import { useState, useEffect } from "react";
 
 function HomePage() {
@@ -51,14 +51,25 @@ function HomePage() {
           </button>
 
           {/* Auth Button */}
-          {!isSignedIn && isLoaded && (
+          {!isSignedIn && isLoaded ? (
             <SignInButton mode="modal">
               <button className="group px-6 py-3 bg-linear-to-r from-primary to-secondary rounded-xl text-white font-semibold text-sm shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 flex items-center gap-2 border border-white">
                 <span>Get Started</span>
                 <ArrowRightIcon className="size-4 group-hover:translate-x-0.5 transition-transform" />
               </button>
             </SignInButton>
-          )}
+          ) : isSignedIn && isLoaded ? (
+            <div className="flex items-center gap-3">
+              <UserButton 
+                afterSignOutUrl="/dashboard"
+                appearance={{
+                  elements: {
+                    avatarBox: "w-10 h-10",
+                  },
+                }}
+              />
+            </div>
+          ) : null}
         </div>
       </nav>
 
