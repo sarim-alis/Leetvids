@@ -4,9 +4,26 @@ import Navbar from "../components/Navbar";
 import { PROBLEMS } from "../data/problems";
 import { ChevronRightIcon, Code2Icon } from "lucide-react";
 import { getDifficultyBadgeClass } from "../lib/utils";
+import { useUser } from "@clerk/clerk-react";
+import { Navigate } from "react-router";
 
 // Frontend.
 function ProblemsPage() {
+  // Authentication check
+  const { isSignedIn, isLoaded } = useUser();
+  
+  if (!isLoaded) {
+    return (
+      <div className="min-h-screen bg-base-200 flex items-center justify-center">
+        <div className="loading loading-spinner loading-lg"></div>
+      </div>
+    );
+  }
+
+  if (!isSignedIn) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
   // States.
   const problems = Object.values(PROBLEMS);
   const easyProblemsCount = problems.filter((p) => p.difficulty === "Easy").length;
