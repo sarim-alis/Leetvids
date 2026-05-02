@@ -1,8 +1,19 @@
 import { Link } from "react-router";
-import { ArrowRightIcon, CheckIcon, Code2Icon, SparklesIcon, UsersIcon, VideoIcon, ZapIcon } from "lucide-react";
+import { ArrowRightIcon, CheckIcon, Code2Icon, MoonIcon, SparklesIcon, SunIcon, UsersIcon, VideoIcon, ZapIcon } from "lucide-react";
 import { SignInButton } from "@clerk/clerk-react";
+import { useState, useEffect } from "react";
 
 function HomePage() {
+  const [theme, setTheme] = useState('dark');
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prevTheme => prevTheme === 'dark' ? 'light' : 'dark');
+  };
+
   return (
     <div className="bg-linear-to-br from-base-100 via-base-200 to-base-300">
       {/* Navbar */}
@@ -17,17 +28,30 @@ function HomePage() {
               <SparklesIcon className="size-6 text-white" />
             </div>
 
-            <div className="flex flex-col">
-              <span className="font-black text-xl bg-linear-to-r from-primary via-secondary to-accent bg-clip-text text-transparent font-mono tracking-wider">
-                Talent IQ
+            <div className="flex flex-col ">
+              <span className="font-black text-xl bg-linear-to-r from-primary via-secondary to-accent bg-clip-text font-mono tracking-wider text-white">
+                LeetVid
               </span>
               <span className="text-xs text-base-content/60 font-medium -mt-1">Code Together</span>
             </div>
           </Link>
 
+          {/* Theme Toggle Button */}
+          <button
+            onClick={toggleTheme}
+            className="p-3 rounded-xl bg-base-200 hover:bg-base-300 transition-colors duration-200 border border-white"
+            aria-label="Toggle theme"
+          >
+            {theme === 'dark' ? (
+              <SunIcon className="size-5 text-warning" />
+            ) : (
+              <MoonIcon className="size-5 text-base-content" />
+            )}
+          </button>
+
           {/* Auth Button */}
           <SignInButton mode="modal">
-            <button className="group px-6 py-3 bg-linear-to-r from-primary to-secondary rounded-xl text-white font-semibold text-sm shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 flex items-center gap-2">
+            <button className="group px-6 py-3 bg-linear-to-r from-primary to-secondary rounded-xl text-white font-semibold text-sm shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 flex items-center gap-2 border border-white">
               <span>Get Started</span>
               <ArrowRightIcon className="size-4 group-hover:translate-x-0.5 transition-transform" />
             </button>
@@ -89,8 +113,8 @@ function HomePage() {
               </button>
             </div>
 
-            {/* Stats */}
-            <div className="stats stats-vertical lg:stats-horizontal bg-base-100 shadow-lg">
+            {/* Stats */} 
+            <div className="stats stats-vertical lg:stats-horizontal bg-base-100 shadow-lg border border-white">
               <div className="stat">
                 <div className="stat-value text-primary">10K+</div>
                 <div className="stat-title">Active Users</div>
@@ -116,7 +140,7 @@ function HomePage() {
       </div>
 
       {/* Features Section */}
-      <div className="max-w-7xl mx-auto px-4 py-20">
+      <div className="max-w-7xl mx-auto px-4 py-20 ">
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold mb-4">
             Everything You Need to <span className="text-primary font-mono">Succeed</span>
@@ -129,7 +153,7 @@ function HomePage() {
         {/* Features Grid*/}
         <div className="grid md:grid-cols-3 gap-8">
           {/* Feature 1 */}
-          <div className="card bg-base-100 shadow-xl">
+          <div className="card bg-base-100 shadow-xl border border-white">
             <div className="card-body items-center text-center">
               <div className="size-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-4">
                 <VideoIcon className="size-8 text-primary" />
@@ -142,7 +166,7 @@ function HomePage() {
           </div>
 
           {/* Feature 2 */}
-          <div className="card bg-base-100 shadow-xl">
+          <div className="card bg-base-100 shadow-xl border border-white">
             <div className="card-body items-center text-center">
               <div className="size-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-4">
                 <Code2Icon className="size-8 text-primary" />
@@ -155,7 +179,7 @@ function HomePage() {
           </div>
 
           {/* Feature 3 */}
-          <div className="card bg-base-100 shadow-xl">
+          <div className="card bg-base-100 shadow-xl border border-white">
             <div className="card-body items-center text-center">
               <div className="size-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-4">
                 <UsersIcon className="size-8 text-primary" />
