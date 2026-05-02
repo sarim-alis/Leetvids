@@ -1,24 +1,27 @@
-import { SignedIn, SignedOut, SignInButton, SignOutButton, UserButton } from "@clerk/clerk-react";
-
+import { SignedIn, SignedOut, SignInButton, SignOutButton, UserButton, useUser } from "@clerk/clerk-react";
+import { Routes, Route, Navigate } from "react-router";
+import HomePage from "./pages/HomePage";
+import AboutPage from "./pages/AboutPage";
+import ProblemsPage from "./pages/ProblemsPage";
+import DashboardPage from "./pages/DashboardPage";
+import { Toaster } from "react-hot-toast";
 
 function App() {
+  const { isSignedIn, isLoaded } = useUser();
+  if (!isLoaded) return null;
+
   return (
     <>
-        <h1 className="text-orange-300 font-bold">Welcome to app ⭐</h1>
-        <button className="btn btn-secondary">Daisuy ui</button>
+      <Routes>
+        <Route path="/"          element={isSignedIn ? <HomePage />      : <Navigate to={"/dashboard"} />} />
+        <Route path="/dashboard" element={!isSignedIn ?  <DashboardPage /> : <Navigate to={"/"} />} />
+        <Route path="/about"     element={<AboutPage />} />
+        <Route path="/problems"  element={isSignedIn ?  <ProblemsPage />  : <HomePage />} />
+      </Routes>
 
-        <SignedOut>
-         <SignInButton mode="modal">
-          <button>Login</button>
-         </SignInButton>
-        </SignedOut>
-
-        <SignedIn>
-          <SignOutButton />
-        </SignedIn>
-        <UserButton />
+      <Toaster position="top-right" toastOptions={{duration:3000}} />
     </>
   );
 }
 
-export default App
+export default App;
