@@ -1,10 +1,11 @@
 import { Link } from "react-router";
 import { ArrowRightIcon, CheckIcon, Code2Icon, MoonIcon, SparklesIcon, SunIcon, UsersIcon, VideoIcon, ZapIcon } from "lucide-react";
-import { SignInButton } from "@clerk/clerk-react";
+import { SignInButton, useUser } from "@clerk/clerk-react";
 import { useState, useEffect } from "react";
 
 function HomePage() {
   const [theme, setTheme] = useState('dark');
+  const { isSignedIn, isLoaded } = useUser();
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -50,12 +51,14 @@ function HomePage() {
           </button>
 
           {/* Auth Button */}
-          <SignInButton mode="modal">
-            <button className="group px-6 py-3 bg-linear-to-r from-primary to-secondary rounded-xl text-white font-semibold text-sm shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 flex items-center gap-2 border border-white">
-              <span>Get Started</span>
-              <ArrowRightIcon className="size-4 group-hover:translate-x-0.5 transition-transform" />
-            </button>
-          </SignInButton>
+          {!isSignedIn && isLoaded && (
+            <SignInButton mode="modal">
+              <button className="group px-6 py-3 bg-linear-to-r from-primary to-secondary rounded-xl text-white font-semibold text-sm shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 flex items-center gap-2 border border-white">
+                <span>Get Started</span>
+                <ArrowRightIcon className="size-4 group-hover:translate-x-0.5 transition-transform" />
+              </button>
+            </SignInButton>
+          )}
         </div>
       </nav>
 
@@ -100,12 +103,14 @@ function HomePage() {
 
             {/* Cta Buttons */}
             <div className="flex flex-wrap gap-4">
-              <SignInButton mode="modal">
-                <button className="btn btn-primary btn-lg">
-                  Start Coding Now
-                  <ArrowRightIcon className="size-5" />
-                </button>
-              </SignInButton>
+              {!isSignedIn && isLoaded && (
+                <SignInButton mode="modal">
+                  <button className="btn btn-primary btn-lg">
+                    Start Coding Now
+                    <ArrowRightIcon className="size-5" />
+                  </button>
+                </SignInButton>
+              )}
 
               <button className="btn btn-outline btn-lg">
                 <VideoIcon className="size-5" />
