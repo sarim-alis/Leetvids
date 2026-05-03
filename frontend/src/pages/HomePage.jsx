@@ -1,9 +1,12 @@
+// Imports.
 import { Link } from "react-router";
 import { ArrowRightIcon, CheckIcon, Code2Icon, MoonIcon, SparklesIcon, SunIcon, UsersIcon, VideoIcon, ZapIcon } from "lucide-react";
 import { SignInButton, UserButton, useUser } from "@clerk/clerk-react";
 import { useState, useEffect } from "react";
 
-function HomePage() {
+// Frontend.
+function HomePage() {  
+  // States.
   const [theme, setTheme] = useState('dark');
   const { isSignedIn, isLoaded } = useUser();
 
