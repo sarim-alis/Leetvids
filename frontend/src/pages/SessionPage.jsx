@@ -1,8 +1,8 @@
 // Imports.
-import { useUser } from "@clerk/clerk-react";
+import { useUser, useAuth } from "@clerk/clerk-react";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
-import { useEndSession, useJoinSession, useSessionById } from "../hooks/useSessions";
+import { useEndSession, useJoinSession } from "../hooks/useSessions";
 import { PROBLEMS } from "../data/problems";
 import { executeCode } from "../lib/piston";
 import Navbar from "../components/Navbar";
@@ -21,12 +21,47 @@ function SessionPage() {
   const navigate = useNavigate();
   const { id } = useParams();
   const { user } = useUser();
+  const { getToken } = useAuth();
   const [output, setOutput] = useState(null);
   const [isRunning, setIsRunning] = useState(false);
-  const { data: sessionData, isLoading: loadingSession, refetch } = useSessionById(id);
+  const [session, setSession] = useState(null);
+  const [loadingSession, setLoadingSession] = useState(true);
   const joinSessionMutation = useJoinSession();
   const endSessionMutation = useEndSession();
-  const session = sessionData?.session;
+
+  // Fetch session data
+  useEffect(() => {
+    const fetchSession = async () => {
+      try {
+        setLoadingSession(true);
+        const token = await getToken();
+        const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
+        
+        const response = await fetch(`${API_URL}/sessions/${id}`, {
+          headers: {
+            "Authorization": token ? `Bearer ${token}` : "",
+          },
+        });
+        
+        const data = await response.json();
+        console.log("Session data response:", data);
+        
+        if (data.session) {
+          setSession(data.session);
+        } else if (data._id) {
+          setSession(data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch session:", error);
+      } finally {
+        setLoadingSession(false);
+      }
+    };
+
+    if (id) {
+      fetchSession();
+    }
+  }, [id, getToken]);
   const isHost = session?.host?.clerkId === user?.id;
   const isParticipant = session?.participant?.clerkId === user?.id;
   const { call, channel, chatClient, isInitializingCall, streamClient } = useStreamClient( session, loadingSession, isHost, isParticipant );
@@ -41,9 +76,9 @@ function SessionPage() {
     if (!session || !user || loadingSession) return;
     if (isHost || isParticipant) return;
 
-    joinSessionMutation.mutate(id, { onSuccess: refetch });
+    joinSessionMutation.mutate(id);
 
-    // Remove joinSessionMutation, refetch from dependencies to avoid infinite loop.
+    // Remove joinSessionMutation from dependencies to avoid infinite loop.
   }, [session, user, loadingSession, isHost, isParticipant, id]);
 
   // Redirect participant when session ends.
