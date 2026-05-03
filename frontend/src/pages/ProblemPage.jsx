@@ -8,6 +8,7 @@ import OutputPanel from "../components/OutputPanel";
 import CodeEditorPanel from "../components/CodeEditorPanel";
 import Navbar from "../components/Navbar";
 import { executeCode } from "../lib/piston";
+import { validateSolution, generateHint } from "../lib/openai";
 import toast from "react-hot-toast";
 import confetti from "canvas-confetti";
 
@@ -21,6 +22,9 @@ function ProblemPage() {
   const [code, setCode] = useState(PROBLEMS[currentProblemId].starterCode.javascript);
   const [output, setOutput] = useState(null);
   const [isRunning, setIsRunning] = useState(false);
+  const [isValidating, setIsValidating] = useState(false);
+  const [aiValidation, setAiValidation] = useState(null);
+  const [hint, setHint] = useState(null);
   const currentProblem = PROBLEMS[currentProblemId];
 
   // Update problem when url param changes.
@@ -84,6 +88,68 @@ function ProblemPage() {
       }
     } else {
       toast.error("Code execution failed!");
+    }
+  };
+
+  const handleValidateWithAI = async () => {
+    if (!currentProblem.openaiValidation?.enabled) {
+      toast.error("AI validation not available for this problem");
+      return;
+    }
+
+    setIsValidating(true);
+    setAiValidation(null);
+
+    try {
+      const validation = await validateSolution(
+        currentProblem.title,
+        currentProblem.description.text,
+        code,
+        selectedLanguage
+      );
+
+      setAiValidation(validation);
+
+      if (validation.success) {
+        if (validation.isCorrect) {
+          toast.success(`AI Validation: Score ${validation.score}/100 - Solution is correct!`);
+          if (validation.score >= 90) {
+            triggerConfetti();
+          }
+        } else {
+          toast.error(`AI Validation: Score ${validation.score}/100 - Solution needs improvement`);
+        }
+      } else {
+        toast.error("AI validation failed");
+      }
+    } catch (error) {
+      toast.error("Error validating with AI");
+    } finally {
+      setIsValidating(false);
+    }
+  };
+
+  const handleGetHint = async () => {
+    if (!currentProblem.openaiValidation?.enabled) {
+      toast.error("Hints not available for this problem");
+      return;
+    }
+
+    try {
+      const hintResult = await generateHint(
+        currentProblem.title,
+        currentProblem.description.text,
+        selectedLanguage
+      );
+
+      if (hintResult.success) {
+        setHint(hintResult.hint);
+        toast.success("Hint generated!");
+      } else {
+        toast.error("Failed to generate hint");
+      }
+    } catch (error) {
+      toast.error("Error getting hint");
     }
   };
 

@@ -71,6 +71,20 @@ class Solution {
       python: "[0, 1]\n[1, 2]\n[0, 1]",
       java: "[0, 1]\n[1, 2]\n[0, 1]",
     },
+    openaiValidation: {
+      enabled: true,
+      testCases: [
+        { input: [2, 7, 11, 15], target: 9, expected: [0, 1] },
+        { input: [3, 2, 4], target: 6, expected: [1, 2] },
+        { input: [3, 3], target: 6, expected: [0, 1] }
+      ],
+      validationCriteria: [
+        "Returns correct indices",
+        "Handles duplicate numbers",
+        "Efficient solution (O(n) or better)",
+        "Proper edge case handling"
+      ]
+    }
   },
 
   "reverse-string": {
@@ -143,6 +157,19 @@ class Solution {
       python: "['o', 'l', 'l', 'e', 'h']\n['h', 'a', 'n', 'n', 'a', 'H']",
       java: "[o, l, l, e, h]\n[h, a, n, n, a, H]",
     },
+    openaiValidation: {
+      enabled: true,
+      testCases: [
+        { input: ["h","e","l","l","o"], expected: ["o","l","l","e","h"] },
+        { input: ["H","a","n","n","a","h"], expected: ["h","a","n","n","a","H"] }
+      ],
+      validationCriteria: [
+        "Reverses string in-place",
+        "O(1) extra space complexity",
+        "Handles odd and even length strings",
+        "No additional memory allocation"
+      ]
+    }
   },
 
   "valid-palindrome": {
@@ -210,6 +237,20 @@ print(isPalindrome(" "))  # Expected: True`,
       python: "True\nFalse\nTrue",
       java: "true\nfalse\ntrue",
     },
+    openaiValidation: {
+      enabled: true,
+      testCases: [
+        { input: "A man, a plan, a canal: Panama", expected: true },
+        { input: "race a car", expected: false },
+        { input: " ", expected: true }
+      ],
+      validationCriteria: [
+        "Correctly identifies palindromes",
+        "Handles case insensitivity",
+        "Ignores non-alphanumeric characters",
+        "Efficient two-pointer approach"
+      ]
+    }
   },
 
   "maximum-subarray": {
@@ -276,6 +317,20 @@ print(maxSubArray([5,4,-1,7,8]))  # Expected: 23`,
       python: "6\n1\n23",
       java: "6\n1\n23",
     },
+    openaiValidation: {
+      enabled: true,
+      testCases: [
+        { input: [-2,1,-3,4,-1,2,1,-5,4], expected: 6 },
+        { input: [1], expected: 1 },
+        { input: [5,4,-1,7,8], expected: 23 }
+      ],
+      validationCriteria: [
+        "Finds maximum subarray sum correctly",
+        "Handles all negative numbers",
+        "Efficient O(n) solution (Kadane's algorithm)",
+        "Proper edge case handling"
+      ]
+    }
   },
 
   "container-with-most-water": {
