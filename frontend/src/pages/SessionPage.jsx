@@ -62,7 +62,7 @@ function SessionPage() {
       fetchSession();
     }
   }, [id, getToken]);
-  const isHost = session?.host?.clerkId === user?.id;
+  const isHost = !session?.host || session?.host?.clerkId === user?.id;
   const isParticipant = session?.participant?.clerkId === user?.id;
   const { call, channel, chatClient, isInitializingCall, streamClient } = useStreamClient( session, loadingSession, isHost, isParticipant );
   const problemData = session?.problem

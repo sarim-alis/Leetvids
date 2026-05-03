@@ -11,17 +11,46 @@ function useStreamClient(session, loadingSession, isHost, isParticipant) {
   const [channel, setChannel] = useState(null);
   const [isInitializingCall, setIsInitializingCall] = useState(true);
 
+  console.log("useStreamClient called with:", { 
+    session: session ? "exists" : "null", 
+    loadingSession, 
+    isHost, 
+    isParticipant,
+    callId: session?.callId 
+  });
+
   useEffect(() => {
     let videoCall = null;
     let chatClientInstance = null;
 
     const initCall = async () => {
-      if (!session?.callId) return;
-      if (!isHost && !isParticipant) return;
-      if (session.status === "completed") return;
+      console.log("initCall called - checking conditions:");
+      console.log("- session?.callId:", session?.callId);
+      console.log("- isHost:", isHost);
+      console.log("- isParticipant:", isParticipant);
+      console.log("- session.status:", session.status);
+      
+      if (!session?.callId) {
+        console.log("initCall returning: no callId");
+        return;
+      }
+      if (!isHost && !isParticipant) {
+        console.log("initCall returning: not host or participant");
+        return;
+      }
+      if (session.status === "completed") {
+        console.log("initCall returning: session completed");
+        return;
+      }
+      
+      console.log("initCall: all conditions passed, proceeding with initialization");
 
       try {
+        console.log("Initializing Stream call for session:", session.callId);
+        console.log("Stream API Key:", import.meta.env.VITE_STREAM_API_KEY ? "Set" : "Not set");
+        
         const { token, userId, userName, userImage } = await sessionApi.getStreamToken();
+        console.log("Stream token response:", { token: token ? "Received" : "Missing", userId, userName });
 
         const client = await initializeStreamClient(
           {
@@ -55,14 +84,34 @@ function useStreamClient(session, loadingSession, isHost, isParticipant) {
         await chatChannel.watch();
         setChannel(chatChannel);
       } catch (error) {
-        toast.error("Failed to join video call");
-        console.error("Error init call", error);
+        console.error("Error initializing Stream call:", error);
+        console.error("Error details:", error.response?.data || error.message);
+        
+        if (error.message.includes("API key")) {
+          toast.error("Stream API key not configured");
+        } else if (error.response?.status === 401) {
+          toast.error("Authentication failed for video call");
+        } else {
+          toast.error("Failed to connect to video call");
+        }
       } finally {
         setIsInitializingCall(false);
       }
     };
 
-    if (session && !loadingSession) initCall();
+    console.log("useStreamClient useEffect - checking conditions:", {
+      hasSession: !!session,
+      loadingSession,
+      shouldInit: session && !loadingSession
+    });
+
+    if (session && !loadingSession) {
+      console.log("useStreamClient - calling initCall");
+      initCall();
+    } else {
+      console.log("useStreamClient - not calling initCall, conditions not met");
+      setIsInitializingCall(false);
+    }
 
     // cleanup - performance reasons
     return () => {
