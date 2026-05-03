@@ -49,14 +49,28 @@ function useStreamClient(session, loadingSession, isHost, isParticipant) {
         console.log("Initializing Stream call for session:", session.callId);
         console.log("Stream API Key:", import.meta.env.VITE_STREAM_API_KEY ? "Set" : "Not set");
         
-        const { token, userId, userName, userImage } = await sessionApi.getStreamToken();
-        console.log("Stream token response:", { token: token ? "Received" : "Missing", userId, userName });
+        const tokenResponse = await sessionApi.getStreamToken();
+        console.log("Full Stream token response:", tokenResponse);
+        
+        const { token, userId, userName, userImage } = tokenResponse;
+        console.log("Extracted Stream token data:", { 
+          token: token ? "Received" : "Missing", 
+          userId: userId || "MISSING", 
+          userName: userName || "MISSING",
+          userImage: userImage || "MISSING"
+        });
+
+        if (!userId) {
+          console.error("Stream token response missing userId - cannot initialize video call");
+          toast.error("Failed to get user information for video call");
+          return;
+        }
 
         const client = await initializeStreamClient(
           {
             id: userId,
-            name: userName,
-            image: userImage,
+            name: userName || 'Anonymous User',
+            image: userImage || '',
           },
           token
         );

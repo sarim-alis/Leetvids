@@ -87,9 +87,9 @@ export const sessionApi = {
     return response.data;
   },
   getStreamToken: async () => {
-    console.log("Getting Stream token from:", `${axiosInstance.defaults.baseURL}/chat/token`);
+    console.log("Getting Stream token from:", `${axiosInstance.defaults.baseURL}/chats/token`);
     try {
-      const response = await axiosInstance.get(`/chat/token`);
+      const response = await axiosInstance.get(`/chats/token`);
       console.log("Stream token response:", response.data);
       return response.data;
     } catch (error) {
