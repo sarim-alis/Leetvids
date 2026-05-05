@@ -3,6 +3,7 @@ import { StreamChat } from "stream-chat";
 import toast from "react-hot-toast";
 import { initializeStreamClient, disconnectStreamClient } from "../lib/stream";
 import { sessionApi } from "../api/sessions";
+import { useAuth } from "@clerk/clerk-react";
 
 function useStreamClient(session, loadingSession, isHost, isParticipant) {
   const [streamClient, setStreamClient] = useState(null);
@@ -10,6 +11,7 @@ function useStreamClient(session, loadingSession, isHost, isParticipant) {
   const [chatClient, setChatClient] = useState(null);
   const [channel, setChannel] = useState(null);
   const [isInitializingCall, setIsInitializingCall] = useState(true);
+  const { getToken } = useAuth();
 
   console.log("useStreamClient called with:", { 
     session: session ? "exists" : "null", 
@@ -49,10 +51,16 @@ function useStreamClient(session, loadingSession, isHost, isParticipant) {
         console.log("Initializing Stream call for session:", session.callId);
         console.log("Stream API Key:", import.meta.env.VITE_STREAM_API_KEY ? "Set" : "Not set");
         
-        const tokenResponse = await sessionApi.getStreamToken();
-        console.log("Full Stream token response:", tokenResponse);
+        // Get auth token from Clerk
+        const authToken = await getToken();
         
-        const { token, userId, userName, userImage } = tokenResponse;
+        const tokenResponse = await sessionApi.getStreamToken(authToken);
+        console.log("Full Stream token response:", tokenResponse);
+        console.log("Response type:", typeof tokenResponse);
+        console.log("Response keys:", Object.keys(tokenResponse || {}));
+        console.log("Response stringified:", JSON.stringify(tokenResponse, null, 2));
+        
+        const { token, userId, userName, userImage } = tokenResponse || {};
         console.log("Extracted Stream token data:", { 
           token: token ? "Received" : "Missing", 
           userId: userId || "MISSING", 
@@ -100,11 +108,15 @@ function useStreamClient(session, loadingSession, isHost, isParticipant) {
       } catch (error) {
         console.error("Error initializing Stream call:", error);
         console.error("Error details:", error.response?.data || error.message);
+        console.error("Error status:", error.response?.status);
+        console.error("Error config:", error.config);
         
         if (error.message.includes("API key")) {
           toast.error("Stream API key not configured");
         } else if (error.response?.status === 401) {
           toast.error("Authentication failed for video call");
+        } else if (error.response?.status === 403) {
+          toast.error("Access denied - check user permissions");
         } else {
           toast.error("Failed to connect to video call");
         }

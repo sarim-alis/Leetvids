@@ -86,12 +86,33 @@ export const sessionApi = {
     const response = await axiosInstance.post(`/sessions/${id}/end`);
     return response.data;
   },
-  getStreamToken: async () => {
-    console.log("Getting Stream token from:", `${axiosInstance.defaults.baseURL}/chats/token`);
+  getStreamToken: async (authToken) => {
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+    const fullUrl = `${apiUrl}/chats/token`;
+    console.log("Getting Stream token from:", fullUrl);
+    
     try {
-      const response = await axiosInstance.get(`/chats/token`);
-      console.log("Stream token response:", response.data);
-      return response.data;
+      console.log("Stream token auth token:", authToken ? "Present" : "Missing");
+      
+      const response = await fetch(fullUrl, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}`
+        }
+      });
+      
+      console.log("Stream token response status:", response.status);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Stream token error response:", errorText);
+        throw new Error(`Failed to get Stream token: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log("Stream token response:", data);
+      return data;
     } catch (error) {
       console.error("Failed to get Stream token:", error);
       throw error;

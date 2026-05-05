@@ -20,7 +20,7 @@ app.use(clerkMiddleware());
 
 
 // Routes.
-app.get("/", (req, res) => { res.status(200).json({ message: "Server health is good. 🔋" });})
+// app.get("/", (req, res) => { res.status(200).json({ message: "Server health is good. 🔋" });})
 app.use("/api/clerk", clerkRoutes);
 app.use("/api/chats", chatRoutes);
 app.use("/api/sessions", sessionRoutes);
