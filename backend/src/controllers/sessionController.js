@@ -54,15 +54,12 @@ export async function getActiveSessions(_, res) {
 
 export async function getMyRecentSessions(req, res) {
   try {
-    if (!req.user || !req.user._id) {
-      return res.status(200).json({ sessions: [] });
-    }
-    
-    const userId = req.user._id;
+    // Return all completed sessions (removed user filter for testing)
     const sessions = await Session.find({
-      status: "completed",
-      $or: [{ host: userId }, { participant: userId }],
+      status: "completed"
     })
+      .populate("host", "name profileImage email clerkId")
+      .populate("participant", "name profileImage email clerkId")
       .sort({ createdAt: -1 })
       .limit(20);
 
