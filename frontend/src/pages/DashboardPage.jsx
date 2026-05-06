@@ -91,8 +91,8 @@ function DashboardPage() {
     }
   };
 
-  const activeSessions = activeSessionsData?.sessions || [];
-  const recentSessions = recentSessionsData?.sessions || [];
+  const activeSessions = activeSessionsData || [];
+  const recentSessions = recentSessionsData || [];
 
   const isUserInSession = (session) => {
     if (!user.id) return false;
@@ -111,7 +111,7 @@ function DashboardPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <StatsCards
               activeSessionsCount={activeSessions.length}
-              recentSessionsCount={recentSessions.length}
+              recentSessionsCount={activeSessions.length + recentSessions.length}
             />
             <ActiveSessions
               sessions={activeSessions}

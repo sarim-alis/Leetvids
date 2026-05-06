@@ -53,9 +53,11 @@ export const sessionApi = {
       console.log("Full response:", response);
       console.log("Request URL was:", response.config.url);
       console.log("Full request URL:", response.config.baseURL + response.config.url);
-      return response.data;
+      // Extract sessions array from response
+      return response.data.sessions || [];
     } catch (error) {
       console.error("Error getting active sessions:", error);
+      return [];
     }
   },
   getMyRecentSessions: async () => {
@@ -67,9 +69,11 @@ export const sessionApi = {
       console.log("Full response:", response);
       console.log("Request URL was:", response.config.url);
       console.log("Full request URL:", response.config.baseURL + response.config.url);
-      return response.data;
+      // Extract sessions array from response
+      return response.data.sessions || [];
     } catch (error) {
       console.error("Error getting my recent sessions:", error);
+      return []; // Return empty array instead of undefined
     }
   },
 

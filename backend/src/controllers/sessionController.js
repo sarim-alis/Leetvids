@@ -54,6 +54,10 @@ export async function getActiveSessions(_, res) {
 
 export async function getMyRecentSessions(req, res) {
   try {
+    if (!req.user || !req.user._id) {
+      return res.status(200).json({ sessions: [] });
+    }
+    
     const userId = req.user._id;
     const sessions = await Session.find({
       status: "completed",
