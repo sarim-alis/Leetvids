@@ -14,6 +14,7 @@ import OutputPanel from "../components/OutputPanel";
 import useStreamClient from "../hooks/useStreamClient";
 import { StreamCall, StreamVideo } from "@stream-io/video-react-sdk";
 import VideoCallUI from "../components/VideoCallUI";
+import toast from "react-hot-toast";
 
 // Frontend.
 function SessionPage() {
@@ -104,6 +105,27 @@ function SessionPage() {
     setOutput(null);
   };
 
+  const normalizeOutput = (output) => {
+    if (!output) return "";
+    return output
+      .split("\n")
+      .map((line) =>
+        line
+          .trim()
+          .replace(/\[\s+/g, "[")
+          .replace(/\s+\]/g, "]")
+          .replace(/\s*,\s*/g, ",")
+      )
+      .filter((line) => line.length > 0)
+      .join("\n");
+  };
+
+  const checkIfTestsPassed = (actualOutput, expectedOutput) => {
+    const normalizedActual = normalizeOutput(actualOutput);
+    const normalizedExpected = normalizeOutput(expectedOutput);
+    return normalizedActual == normalizedExpected;
+  };
+
   const handleRunCode = async () => {
     setIsRunning(true);
     setOutput(null);
@@ -111,6 +133,21 @@ function SessionPage() {
     const result = await executeCode(selectedLanguage, code);
     setOutput(result);
     setIsRunning(false);
+
+    if (result.success && problemData?.expectedOutput) {
+      const expectedOutput = problemData.expectedOutput[selectedLanguage];
+      if (expectedOutput) {
+        const testsPassed = checkIfTestsPassed(result.output, expectedOutput);
+
+        if (testsPassed) {
+          toast.success("All tests passed! Great job!");
+        } else {
+          toast.error("Tests failed. Check your output!");
+        }
+      }
+    } else if (!result.success) {
+      toast.error("Code execution failed!");
+    }
   };
 
   const handleEndSession = () => {
