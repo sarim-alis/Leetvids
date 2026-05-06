@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { StreamChat } from "stream-chat";
 import toast from "react-hot-toast";
 import { initializeStreamClient, disconnectStreamClient } from "../lib/stream";
@@ -12,6 +12,7 @@ function useStreamClient(session, loadingSession, isHost, isParticipant) {
   const [channel, setChannel] = useState(null);
   const [isInitializingCall, setIsInitializingCall] = useState(true);
   const { getToken } = useAuth();
+  const isInitializedRef = useRef(false);
 
   console.log("useStreamClient called with:", { 
     session: session ? "exists" : "null", 
@@ -26,6 +27,11 @@ function useStreamClient(session, loadingSession, isHost, isParticipant) {
     let chatClientInstance = null;
 
     const initCall = async () => {
+      // Prevent duplicate initialization
+      if (isInitializedRef.current) {
+        console.log("initCall: already initialized, skipping");
+        return;
+      }
       console.log("initCall called - checking conditions:");
       console.log("- session?.callId:", session?.callId);
       console.log("- isHost:", isHost);
@@ -105,6 +111,10 @@ function useStreamClient(session, loadingSession, isHost, isParticipant) {
         const chatChannel = chatClientInstance.channel("messaging", session.callId);
         await chatChannel.watch();
         setChannel(chatChannel);
+        console.log("Chat client and channel set successfully");
+        
+        // Mark as initialized to prevent duplicate connections
+        isInitializedRef.current = true;
       } catch (error) {
         console.error("Error initializing Stream call:", error);
         console.error("Error details:", error.response?.data || error.message);
@@ -141,6 +151,9 @@ function useStreamClient(session, loadingSession, isHost, isParticipant) {
 
     // cleanup - performance reasons
     return () => {
+      // Reset initialization flag
+      isInitializedRef.current = false;
+      
       // iife
       (async () => {
         try {
