@@ -118,28 +118,43 @@ export async function joinSession(req, res) {
 export async function endSession(req, res) {
   try {
     const { id } = req.params;
-    const userId = req.user._id;
-
+    
     const session = await Session.findById(id);
     if (!session) return res.status(404).json({ message: "Session not found" });
-    if (session.host.toString() !== userId.toString()) {
-      return res.status(403).json({ message: "Only the host can end the session" });
+    
+    // If user is authenticated, check if they are the host
+    if (req.user && req.user._id) {
+      const userId = req.user._id;
+      if (session.host && session.host.toString() !== userId.toString()) {
+        return res.status(403).json({ message: "Only the host can end the session" });
+      }
     }
 
     if (session.status === "completed") {
       return res.status(400).json({ message: "Session is already completed" });
     }
 
-    const call = streamClient.video.call("default", session.callId);
-    await call.delete({ hard: true });
+    // Try to delete Stream call and channel, but don't fail if they don't exist
+    try {
+      const call = streamClient.video.call("default", session.callId);
+      await call.delete({ hard: true });
+    } catch (streamError) {
+      console.log("Error deleting Stream call (may not exist):", streamError.message);
+    }
 
-    const channel = chatClient.channel("messaging", session.callId);
-    await channel.delete();
+    try {
+      const channel = chatClient.channel("messaging", session.callId);
+      await channel.delete();
+    } catch (channelError) {
+      console.log("Error deleting Stream channel (may not exist):", channelError.message);
+    }
+
     session.status = "completed";
     await session.save();
     res.status(200).json({ session, message: "Session ended successfully" });
   } catch (error) {
     console.log("Error in endSession controller:", error.message);
+    console.error("Full error:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 }
