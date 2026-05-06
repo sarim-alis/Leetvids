@@ -122,13 +122,13 @@ function useStreamClient(session, loadingSession, isHost, isParticipant) {
         console.error("Error config:", error.config);
         
         if (error.message.includes("API key")) {
-          toast.error("Stream API key not configured");
+          // toast.error("Stream API key not configured");
         } else if (error.response?.status === 401) {
-          toast.error("Authentication failed for video call");
+          // toast.error("Authentication failed for video call");
         } else if (error.response?.status === 403) {
-          toast.error("Access denied - check user permissions");
+          // toast.error("Access denied - check user permissions");
         } else {
-          toast.error("Failed to connect to video call");
+          // toast.error("Failed to connect to video call");
         }
       } finally {
         setIsInitializingCall(false);
